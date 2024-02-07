@@ -7,6 +7,12 @@ public class DistributedLucasSeries {
     private static volatile int[] relojesLamport; // Relojes de Lamport
 
     public static void main(String[] args) {
+        /*
+         * Solicitar al usuario el número de hilos a usar y el número de términos de la
+         * serie de Lucas a calcular
+         * 
+         * return: void
+         */
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Ingrese el número de hilos a usar: ");
@@ -30,6 +36,15 @@ public class DistributedLucasSeries {
     }
 
     private static void calcularSerieLucasParalela(int numHilos, int n) {
+        /*
+         * Crear y ejecutar los hilos para calcular la serie de Lucas de manera paralela
+         * usando el número de hilos especificado
+         * 
+         * arg: numHilos - El número de hilos a usar
+         * arg: n - El número de términos de la serie de Lucas a calcular
+         * 
+         * return: void
+         */
         Thread[] hilos = new Thread[numHilos];
 
         for (int i = 0; i < numHilos; i++) {
@@ -49,6 +64,15 @@ public class DistributedLucasSeries {
     }
 
     private static void calcularPorcionSerieLucasLamport(int hiloNumero, int n) {
+        /*
+         * Calcular una porción de la serie de Lucas de manera secuencial, usando el
+         * reloj de Lamport para sincronizar la impresión de los resultados
+         * 
+         * arg: hiloNumero - El número del hilo actual
+         * arg: n - El número de términos de la serie de Lucas a calcular
+         * 
+         * return: void
+         */
         while (true) {
             int indiceActual;
             int tiempoLamportInicio = obtenerTiempoLamport(hiloNumero); // Obtener el tiempo al inicio del cálculo
@@ -80,6 +104,12 @@ public class DistributedLucasSeries {
     }
 
     private static int calcularTerminoSerieLucas(int termino) {
+        /*
+         * Calcular el valor de un término de la serie de Lucas
+         * 
+         * arg: termino - El número del término a calcular
+         * return: El valor del término
+         */
         if (termino == 0) {
             return 2;
         } else if (termino == 1) {
@@ -100,6 +130,12 @@ public class DistributedLucasSeries {
     }
 
     private static int obtenerTiempoLamport(int hiloNumero) {
+        /*
+         * Obtener el tiempo actual del reloj de Lamport para el hilo especificado
+         * 
+         * arg: hiloNumero - El número del hilo
+         * return: El tiempo actual del reloj de Lamport para el hilo
+         */
         return relojesLamport[hiloNumero]++;
     }
 }
