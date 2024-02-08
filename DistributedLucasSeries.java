@@ -14,17 +14,42 @@ public class DistributedLucasSeries {
          * serie de Lucas a calcular
          * return: void
          */
+        int numHilos = 0, n = 0;
+        char fallo = 'n';
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Ingrese el número de hilos a usar: ");
-        int numHilos = scanner.nextInt();
+        try {
+            numHilos = scanner.nextInt();
+            if (numHilos < 1) {
+                System.out.println("El número de hilos debe ser mayor a 0.");
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            System.out.println("El número de hilos debe ser un número entero.");
+            System.exit(0);
+        }
 
         System.out.print("Ingrese el número de términos de la serie de Lucas a calcular: ");
-        int n = scanner.nextInt();
+        try { 
+            n = scanner.nextInt();
+            if (n < 1) {
+                System.out.println("El número de términos debe ser mayor a 0.");
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            System.out.println("El número de términos debe ser un número entero.");
+            System.exit(0);
+        }
 
         System.out.print("Le gustaria simular un fallo s(Si) - n(No): ");
-        char fallo = scanner.next().charAt(0);
-
+        fallo = scanner.next().charAt(0);
+        if (fallo != 's' && fallo != 'n') {
+            System.out.println("La opción debe ser s o n.");
+            System.exit(0);
+        }
+        
         scanner.close();
 
         serieLucas = new int[n]; // Inicializar el arreglo para almacenar la serie
