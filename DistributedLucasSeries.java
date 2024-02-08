@@ -2,8 +2,6 @@ import java.util.Scanner;
 import java.util.Random;
 
 
-import java.util.Scanner;
-
 public class DistributedLucasSeries {
 
     private static int terminoActual = 0;  // Variable compartida entre los hilos
@@ -12,21 +10,21 @@ public class DistributedLucasSeries {
 
     public static void main(String[] args) {
         /*
-         * Solicitar al usuario el número de hilos a usar y el número de términos de la
+         * Solicitar al usuario el nÃºmero de hilos a usar y el nÃºmero de tÃ©rminos de la
          * serie de Lucas a calcular
-         * 
          * return: void
          */
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Ingrese el número de hilos a usar: ");
+        System.out.print("Ingrese el nÃºmero de hilos a usar: ");
         int numHilos = scanner.nextInt();
 
-        System.out.print("Ingrese el número de términos de la serie de Lucas a calcular: ");
+        System.out.print("Ingrese el nÃºmero de tÃ©rminos de la serie de Lucas a calcular: ");
         int n = scanner.nextInt();
 
         System.out.print("Le gustaria simular un fallo s(Si) - n(No): ");
         char fallo = scanner.next().charAt(0);
+
         scanner.close();
 
         serieLucas = new int[n]; // Inicializar el arreglo para almacenar la serie
@@ -44,11 +42,11 @@ public class DistributedLucasSeries {
     private static void calcularSerieLucasParalela(int numHilos, int n, char fallo) {
         /*
          * Crear y ejecutar los hilos para calcular la serie de Lucas de manera paralela
-         * usando el número de hilos especificado
+         * usando el nÃºmero de hilos especificado
          * 
-         * arg: numHilos - El número de hilos a usar
-         * arg: n - El número de términos de la serie de Lucas a calcular
-         * 
+         * arg: numHilos - El nÃºmero de hilos a usar
+         * arg: n - El nÃºmero de tÃ©rminos de la serie de Lucas a calcular
+         * arg: fallo - Si se simula un fallo en uno de los hilos
          * return: void
          */
         Thread[] hilos = new Thread[numHilos];
@@ -71,7 +69,7 @@ public class DistributedLucasSeries {
         if (fallo == 's') {
             Random random = new Random();
 
-        // Generar un número entero aleatorio entre 0 y la cantidad maxima de los hilos
+            // Generar un nÃºmero entero aleatorio entre 0 y la cantidad maxima de los hilos
             int randomNumber = random.nextInt(numHilos);
             hilos[randomNumber].interrupt(); // Simulamos que el hilo falla
             System.out.println("Fallo del Hilo " + randomNumber);
@@ -88,17 +86,16 @@ public class DistributedLucasSeries {
 
     private static void calcularPorcionSerieLucasLamport(int hiloNumero, int n) {
         /*
-         * Calcular una porción de la serie de Lucas de manera secuencial, usando el
-         * reloj de Lamport para sincronizar la impresión de los resultados
+         * Calcular una porciÃ³n de la serie de Lucas de manera secuencial, usando el
+         * reloj de Lamport para sincronizar la impresiÃ³n de los resultados
          * 
-         * arg: hiloNumero - El número del hilo actual
-         * arg: n - El número de términos de la serie de Lucas a calcular
-         * 
+         * arg: hiloNumero - El nÃºmero del hilo actual
+         * arg: n - El nÃºmero de tÃ©rminos de la serie de Lucas a calcular
          * return: void
          */
         while (true) {
             int indiceActual;
-            int tiempoLamportInicio = obtenerTiempoLamport(hiloNumero); // Obtener el tiempo al inicio del cálculo
+            int tiempoLamportInicio = obtenerTiempoLamport(hiloNumero); // Obtener el tiempo al inicio del cÃ¡lculo
 
             synchronized (relojesLamport) {
                 indiceActual = terminoActual;
@@ -115,9 +112,9 @@ public class DistributedLucasSeries {
                 }
 
                 try {
-                    Thread.sleep(500); // Simulación del tiempo de ejecución del hilo
+                    Thread.sleep(500); // SimulaciÃ³n del tiempo de ejecuciÃ³n del hilo
                 } catch (InterruptedException e) {
-                    // Manejar la interrupción para la finalización del hilo
+                    // Manejar la interrupciÃ³n para la finalizaciÃ³n del hilo
                     System.out.println("Hilo " + hiloNumero + " interrumpido.");
                     break;
                 }
@@ -129,10 +126,10 @@ public class DistributedLucasSeries {
 
     private static int calcularTerminoSerieLucas(int termino) {
         /*
-         * Calcular el valor de un término de la serie de Lucas
+         * Calcular el valor de un tÃ©rmino de la serie de Lucas
          * 
-         * arg: termino - El número del término a calcular
-         * return: El valor del término
+         * arg: termino - El nÃºmero del tÃ©rmino a calcular
+         * return: El valor del tÃ©rmino
          */
         if (termino == 0) {
             return 2;
@@ -157,7 +154,7 @@ public class DistributedLucasSeries {
         /*
          * Obtener el tiempo actual del reloj de Lamport para el hilo especificado
          * 
-         * arg: hiloNumero - El número del hilo
+         * arg: hiloNumero - El nÃºmero del hilo
          * return: El tiempo actual del reloj de Lamport para el hilo
          */
         return relojesLamport[hiloNumero]++;
