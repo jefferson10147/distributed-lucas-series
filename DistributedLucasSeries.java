@@ -1,3 +1,11 @@
+/*
+ * 
+ * @Authors:
+ * - Galindo Pastrán, Yorman J. V-V-26209587 
+ * - Montilla Mendoza, Jefferson. V-2693551
+ * 
+ */
+
 import java.util.Scanner;
 import java.util.Random;
 
