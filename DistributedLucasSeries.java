@@ -1,4 +1,8 @@
 import java.util.Scanner;
+import java.util.Random;
+
+
+import java.util.Scanner;
 
 public class DistributedLucasSeries {
 
@@ -8,25 +12,27 @@ public class DistributedLucasSeries {
 
     public static void main(String[] args) {
         /*
-         * Solicitar al usuario el nÃºmero de hilos a usar y el nÃºmero de tÃ©rminos de la
+         * Solicitar al usuario el número de hilos a usar y el número de términos de la
          * serie de Lucas a calcular
          * 
          * return: void
          */
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Ingrese el nÃºmero de hilos a usar: ");
+        System.out.print("Ingrese el número de hilos a usar: ");
         int numHilos = scanner.nextInt();
 
-        System.out.print("Ingrese el nÃºmero de tÃ©rminos de la serie de Lucas a calcular: ");
+        System.out.print("Ingrese el número de términos de la serie de Lucas a calcular: ");
         int n = scanner.nextInt();
 
+        System.out.print("Le gustaria simular un fallo s(Si) - n(No): ");
+        char fallo = scanner.next().charAt(0);
         scanner.close();
 
         serieLucas = new int[n]; // Inicializar el arreglo para almacenar la serie
         relojesLamport = new int[numHilos]; // Inicializar el arreglo para los relojes de Lamport
 
-        calcularSerieLucasParalela(numHilos, n);
+        calcularSerieLucasParalela(numHilos, n, fallo);
 
         // Imprimir la serie de manera lineal al finalizar
         System.out.print("Serie de Lucas: ");
@@ -35,13 +41,13 @@ public class DistributedLucasSeries {
         }
     }
 
-    private static void calcularSerieLucasParalela(int numHilos, int n) {
+    private static void calcularSerieLucasParalela(int numHilos, int n, char fallo) {
         /*
          * Crear y ejecutar los hilos para calcular la serie de Lucas de manera paralela
-         * usando el nÃºmero de hilos especificado
+         * usando el número de hilos especificado
          * 
-         * arg: numHilos - El nÃºmero de hilos a usar
-         * arg: n - El nÃºmero de tÃ©rminos de la serie de Lucas a calcular
+         * arg: numHilos - El número de hilos a usar
+         * arg: n - El número de términos de la serie de Lucas a calcular
          * 
          * return: void
          */
@@ -52,6 +58,23 @@ public class DistributedLucasSeries {
 
             hilos[i] = new Thread(() -> calcularPorcionSerieLucasLamport(hiloNumero, n));
             hilos[i].start();
+        }
+        
+        // Introducimos un temporizador para simular un fallo de hilo
+        try {
+            Thread.sleep(300); // Esperar 0.3 segundos
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Simulamos un fallo en uno de los hilos
+        if (fallo == 's') {
+            Random random = new Random();
+
+        // Generar un número entero aleatorio entre 0 y la cantidad maxima de los hilos
+            int randomNumber = random.nextInt(numHilos);
+            hilos[randomNumber].interrupt(); // Simulamos que el hilo falla
+            System.out.println("Fallo del Hilo " + randomNumber);
         }
 
         for (Thread hilo : hilos) {
@@ -65,17 +88,17 @@ public class DistributedLucasSeries {
 
     private static void calcularPorcionSerieLucasLamport(int hiloNumero, int n) {
         /*
-         * Calcular una porciÃ³n de la serie de Lucas de manera secuencial, usando el
-         * reloj de Lamport para sincronizar la impresiÃ³n de los resultados
+         * Calcular una porción de la serie de Lucas de manera secuencial, usando el
+         * reloj de Lamport para sincronizar la impresión de los resultados
          * 
-         * arg: hiloNumero - El nÃºmero del hilo actual
-         * arg: n - El nÃºmero de tÃ©rminos de la serie de Lucas a calcular
+         * arg: hiloNumero - El número del hilo actual
+         * arg: n - El número de términos de la serie de Lucas a calcular
          * 
          * return: void
          */
         while (true) {
             int indiceActual;
-            int tiempoLamportInicio = obtenerTiempoLamport(hiloNumero); // Obtener el tiempo al inicio del cÃ¡lculo
+            int tiempoLamportInicio = obtenerTiempoLamport(hiloNumero); // Obtener el tiempo al inicio del cálculo
 
             synchronized (relojesLamport) {
                 indiceActual = terminoActual;
@@ -91,11 +114,12 @@ public class DistributedLucasSeries {
                             valorTermino + " - Reloj Lamport: " + tiempoLamportInicio);
                 }
 
-                // Simular el tiempo de ejecuciÃ³n del hilo
                 try {
-                    Thread.sleep(500); // SimulaciÃ³n del tiempo de ejecuciÃ³n del hilo
+                    Thread.sleep(500); // Simulación del tiempo de ejecución del hilo
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // Manejar la interrupción para la finalización del hilo
+                    System.out.println("Hilo " + hiloNumero + " interrumpido.");
+                    break;
                 }
             } else {
                 break; // El hilo termina cuando se alcanza el final de la serie
@@ -105,10 +129,10 @@ public class DistributedLucasSeries {
 
     private static int calcularTerminoSerieLucas(int termino) {
         /*
-         * Calcular el valor de un tÃ©rmino de la serie de Lucas
+         * Calcular el valor de un término de la serie de Lucas
          * 
-         * arg: termino - El nÃºmero del tÃ©rmino a calcular
-         * return: El valor del tÃ©rmino
+         * arg: termino - El número del término a calcular
+         * return: El valor del término
          */
         if (termino == 0) {
             return 2;
@@ -133,7 +157,7 @@ public class DistributedLucasSeries {
         /*
          * Obtener el tiempo actual del reloj de Lamport para el hilo especificado
          * 
-         * arg: hiloNumero - El nÃºmero del hilo
+         * arg: hiloNumero - El número del hilo
          * return: El tiempo actual del reloj de Lamport para el hilo
          */
         return relojesLamport[hiloNumero]++;
